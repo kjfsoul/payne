@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=21";
+    img.src = s.image + "?v=22";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=21";
+    vid.src = s.video + "?v=22";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -454,7 +454,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=21";
+  link.href = SCENES[idx].image + "?v=22";
   document.head.appendChild(link);
 }
 
@@ -519,7 +519,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=21";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=22";
     vid.muted = true; vid.playsInline = true; vid.loop = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "metadata");
@@ -542,7 +542,7 @@ function startScene16() {
   scene16Active = true; scene16CurrentTile = 0;
   for (var i = 0; i < 9; i++) {
     var v = scene16Tiles[i] && scene16Tiles[i].querySelector("video");
-    if (v && v.readyState === 0) v.load();
+    if (v) { v.load(); v.play().catch(function(){}); }
   }
   createScene16Rain();
   if (SCENE16_SPIRAL.length > 0) runSpiralStep();
