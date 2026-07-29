@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=24";
+    img.src = s.image + "?v=25";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=24";
+    vid.src = s.video + "?v=25";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -454,7 +454,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=24";
+  link.href = SCENES[idx].image + "?v=25";
   document.head.appendChild(link);
 }
 
@@ -519,7 +519,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=24";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=25";
     vid.muted = true; vid.playsInline = true; vid.loop = true; vid.autoplay = true;
     vid.setAttribute("playsinline", "");
     vid.style.opacity = "1";
@@ -540,13 +540,20 @@ function buildScene16(el) {
 function startScene16() {
   if (scene16Active) return;
   scene16Active = true; scene16CurrentTile = 0;
-  for (var i = 0; i < 9; i++) {
-    var v = scene16Tiles[i] && scene16Tiles[i].querySelector("video");
-    if (v) { 
-      if (v.paused) v.play().catch(function(){}); 
-      v.style.opacity = "1";
-    }
+  
+  // Refresh scene16Tiles from the DOM (robust against stopScene16 clearing them)
+  scene16Tiles = [];
+  var tiles = document.querySelectorAll(".scene16-tile");
+  for (var i = 0; i < tiles.length; i++) {
+    scene16Tiles[i] = tiles[i];
   }
+  
+  // Play all videos
+  for (var i = 0; i < scene16Tiles.length; i++) {
+    var v = scene16Tiles[i] && scene16Tiles[i].querySelector("video");
+    if (v) { v.play().catch(function(){}); }
+  }
+  
   createScene16Rain();
   if (SCENE16_SPIRAL.length > 0) runSpiralStep();
   document.addEventListener("visibilitychange", onScene16Visibility);
@@ -570,10 +577,14 @@ function stopScene16() {
 function runSpiralStep() {
   if (!scene16Active || scene16CurrentTile >= SCENE16_SPIRAL.length) return;
   var ti = SCENE16_SPIRAL[scene16CurrentTile];
-  var tile = scene16Tiles[ti];
+  // Requery tile from DOM for robustness
+  var allTiles = document.querySelectorAll(".scene16-tile");
+  var tile = allTiles[ti];
   if (!tile) return;
+  
   if (scene16CurrentTile > 0) {
-    var pt = scene16Tiles[SCENE16_SPIRAL[scene16CurrentTile - 1]];
+    var prevTi = SCENE16_SPIRAL[scene16CurrentTile - 1];
+    var pt = allTiles[prevTi];
     if (pt) {
       pt.classList.remove("focused");
       pt.classList.add("color-bleed");
