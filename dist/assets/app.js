@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=26";
+    img.src = s.image + "?v=27";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=26";
+    vid.src = s.video + "?v=27";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -398,6 +398,14 @@ function showScene(idx, direction) {
     if (oldV10) { oldV10.pause(); oldV10.currentTime = 0; }
   }
 
+  // Scene 16: start spiral + rain on activation
+  if (idx === 15) {
+    setTimeout(function() { startScene16(); }, 300);
+  }
+  if (oldIdx === 15) {
+    stopScene16();
+  }
+
   if (idx === 14) {
     // Arriving at scene 15 — use black background for text readability
     var img15 = newEl.querySelector("img.scene-bg");
@@ -454,7 +462,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=26";
+  link.href = SCENES[idx].image + "?v=27";
   document.head.appendChild(link);
 }
 
@@ -519,7 +527,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=26";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=27";
     vid.muted = true; vid.playsInline = true; vid.loop = true; vid.autoplay = true;
     vid.setAttribute("playsinline", "");
     vid.style.opacity = "1";
@@ -535,6 +543,12 @@ function buildScene16(el) {
   el.appendChild(rain);
   el.appendChild(ovl);
   el.appendChild(grid);
+
+  // Farewell text
+  var farewell = document.createElement("div");
+  farewell.className = "scene16-farewell";
+  farewell.innerHTML = '<div class="farewell-main">Goodbye, Nicole</div><div class="farewell-sub">I will love you ALWAYS in ALL WAYS.</div>';
+  el.appendChild(farewell);
 }
 
 function startScene16() {
@@ -566,7 +580,7 @@ function stopScene16() {
     if (scene16Tiles[i]) {
       var v = scene16Tiles[i].querySelector("video");
       if (v) v.pause();
-      scene16Tiles[i].classList.remove("focused", "washed", "color-bleed");
+      scene16Tiles[i].classList.remove("focused-stage", "bleed-stage", "washed-stage");
     }
   }
   var r = document.getElementById("scene16-rain");
@@ -586,14 +600,14 @@ function runSpiralStep() {
     var prevTi = SCENE16_SPIRAL[scene16CurrentTile - 1];
     var pt = allTiles[prevTi];
     if (pt) {
-      pt.classList.remove("focused");
-      pt.classList.add("color-bleed");
+      pt.classList.remove("focused-stage");
+      pt.classList.add("bleed-stage");
       setTimeout(function(t) {
-        if (t) { t.classList.remove("color-bleed"); t.classList.add("washed"); }
-      }, 4500, pt);
+        if (t) { t.classList.remove("bleed-stage"); t.classList.add("washed-stage"); }
+      }, 4000, pt);
     }
   }
-  tile.classList.add("focused");
+  tile.classList.add("focused-stage");
   var v = tile.querySelector("video");
   if (v) v.play().catch(function(){});
   scene16CurrentTile++;
