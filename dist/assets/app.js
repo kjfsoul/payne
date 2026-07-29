@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=17";
+    img.src = s.image + "?v=18";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=17";
+    vid.src = s.video + "?v=18";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -243,14 +243,14 @@ function buildSceneEl(idx) {
 
   var wrap = document.createElement("div");
   wrap.className = "scene-text-wrap " + s.textPos;
+  // Black text box for readability on scenes 6 and 7
+  if (idx === 5 || idx === 6) {
+    wrap.classList.add("text-box-black");
+  }
 
   var p = document.createElement("p");
   p.className = "scene-text";
 
-  // Scene 6: glowing red text
-  if (idx === 5) {
-    p.classList.add("scene-text-red");
-  }
   if (s.emphasis) {
     var parts = s.text.split(s.emphasis);
     if (parts.length === 2) {
@@ -445,7 +445,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=17";
+  link.href = SCENES[idx].image + "?v=18";
   document.head.appendChild(link);
 }
 
@@ -510,7 +510,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=17";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=18";
     vid.muted = true; vid.playsInline = true; vid.loop = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "metadata");
