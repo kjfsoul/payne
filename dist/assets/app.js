@@ -190,7 +190,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=13";
+    img.src = s.image + "?v=14";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -206,7 +206,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=13";
+    vid.src = s.video + "?v=14";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -255,13 +255,8 @@ function buildSceneEl(idx) {
     p.textContent = s.text;
   }
 
-  // Scene 16: video grid (no text)
-  if (idx === 15) {
-    buildScene16(el);
-  } else if (s.text) {
-    wrap.appendChild(p);
-    el.appendChild(wrap);
-  }
+  wrap.appendChild(p);
+  el.appendChild(wrap);
   return el;
 }
 
@@ -272,6 +267,8 @@ for (var i = 0; i < SCENES.length; i++) {
   viewer.appendChild(el);
   sceneEls.push(el);
 }
+// Scene 16: replace default content with video grid
+buildScene16(sceneEls[15]);
 
 /* === SHOW SCENE === */
 function showScene(idx, direction) {
@@ -441,7 +438,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=13";
+  link.href = SCENES[idx].image + "?v=14";
   document.head.appendChild(link);
 }
 
@@ -516,7 +513,7 @@ function buildScene16(el) {
     tile.setAttribute("data-tile", i);
 
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=13";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=14";
     vid.muted = true;
     vid.playsInline = true;
     vid.loop = true;
