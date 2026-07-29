@@ -1,0 +1,17 @@
+# Large videos (not needed in repo; can be regenerated)
+dist/assets/chicken.mov
+dist/assets/nevergiveup.mov
+
+# Audio files (can be regenerated)
+dist/assets/time_inception.*
+
+# Source export (reference only)
+finalnicolepaynefitz/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temp files
+/tmp/
+*.tmp
