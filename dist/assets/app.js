@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=18";
+    img.src = s.image + "?v=19";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=18";
+    vid.src = s.video + "?v=19";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -445,7 +445,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=18";
+  link.href = SCENES[idx].image + "?v=19";
   document.head.appendChild(link);
 }
 
@@ -510,7 +510,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=18";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=19";
     vid.muted = true; vid.playsInline = true; vid.loop = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "metadata");
