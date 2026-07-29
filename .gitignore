@@ -15,3 +15,4 @@ Thumbs.db
 # Temp files
 /tmp/
 *.tmp
+dist/assets/scene16/*.mp4

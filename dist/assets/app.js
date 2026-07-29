@@ -149,6 +149,16 @@ var SCENES = [
     emphasis: null,
     bgClass: null,
     zoomOut: false
+  },
+  {
+    image: null,
+    video: null,
+    text: null,
+    overlay: null,
+    textPos: null,
+    emphasis: null,
+    bgClass: null,
+    zoomOut: false
   }
 ];
 
@@ -180,7 +190,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=12";
+    img.src = s.image + "?v=13";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -196,7 +206,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=12";
+    vid.src = s.video + "?v=13";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -245,8 +255,13 @@ function buildSceneEl(idx) {
     p.textContent = s.text;
   }
 
-  wrap.appendChild(p);
-  el.appendChild(wrap);
+  // Scene 16: video grid (no text)
+  if (idx === 15) {
+    buildScene16(el);
+  } else if (s.text) {
+    wrap.appendChild(p);
+    el.appendChild(wrap);
+  }
   return el;
 }
 
@@ -304,10 +319,12 @@ function showScene(idx, direction) {
         oldEl.classList.remove("transitioning-out");
         oldEl.setAttribute("aria-hidden", "true");
         // Pause any video in old scene
-        var oldVids = oldEl.querySelectorAll("video");
-        for (var v = 0; v < oldVids.length; v++) {
-          oldVids[v].pause();
-          oldVids[v].currentTime = 0;
+        if (oldIdx !== 15) {
+          var oldVids = oldEl.querySelectorAll("video");
+          for (var v = 0; v < oldVids.length; v++) {
+            oldVids[v].pause();
+            oldVids[v].currentTime = 0;
+          }
         }
       }
       transitioning = false;
@@ -332,6 +349,14 @@ function showScene(idx, direction) {
     if (!isVideoScene && wasVideoScene) {
       bgAudio.play().catch(function() {});
     }
+  }
+
+  // Scene 16: start/stop controller
+  if (idx === 15) {
+    setTimeout(function() { startScene16(); }, 300);
+  }
+  if (oldIdx === 15) {
+    stopScene16();
   }
 
   // Scene 15: manage video playback (2 loops max) and caption
@@ -416,7 +441,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=12";
+  link.href = SCENES[idx].image + "?v=13";
   document.head.appendChild(link);
 }
 
@@ -471,6 +496,146 @@ document.addEventListener("touchend", function(e) {
     else goPrev();
   }
 });
+
+
+/* ============ SCENE 16: VIDEO GRID CONTROLLER ============ */
+var scene16Active = false;
+var scene16Timer = null;
+var scene16CurrentTile = 0;
+var scene16Tiles = [];
+var SCENE16_SPIRAL = [0, 1, 2, 5, 8, 7, 6, 3, 4];
+var SCENE16_FOCUS_MS = 5000;
+
+function buildScene16(el) {
+  var grid = document.createElement("div");
+  grid.className = "scene16-grid";
+
+  for (var i = 0; i < 9; i++) {
+    var tile = document.createElement("div");
+    tile.className = "scene16-tile";
+    tile.setAttribute("data-tile", i);
+
+    var vid = document.createElement("video");
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=13";
+    vid.muted = true;
+    vid.playsInline = true;
+    vid.loop = true;
+    vid.setAttribute("playsinline", "");
+    vid.setAttribute("preload", "metadata");
+
+    tile.appendChild(vid);
+    grid.appendChild(tile);
+    scene16Tiles[i] = tile;
+  }
+
+  var rain = document.createElement("div");
+  rain.className = "scene16-rain";
+  rain.id = "scene16-rain";
+  el.appendChild(rain);
+
+  var ovl = document.createElement("div");
+  ovl.className = "scene16-overlay";
+  el.appendChild(ovl);
+
+  el.appendChild(grid);
+}
+
+function startScene16() {
+  if (scene16Active) return;
+  scene16Active = true;
+  scene16CurrentTile = 0;
+
+  loadScene16Videos();
+  createScene16Rain();
+
+  if (SCENE16_SPIRAL.length > 0) {
+    runSpiralStep();
+  }
+
+  document.addEventListener("visibilitychange", onScene16Visibility);
+}
+
+function stopScene16() {
+  scene16Active = false;
+  if (scene16Timer) { clearTimeout(scene16Timer); scene16Timer = null; }
+
+  for (var i = 0; i < 9; i++) {
+    if (scene16Tiles[i]) {
+      var v = scene16Tiles[i].querySelector("video");
+      if (v) v.pause();
+      scene16Tiles[i].classList.remove("focused", "washed", "color-bleed");
+    }
+  }
+
+  var rain = document.getElementById("scene16-rain");
+  if (rain) rain.innerHTML = "";
+
+  document.removeEventListener("visibilitychange", onScene16Visibility);
+  scene16Tiles = [];
+}
+
+function loadScene16Videos() {
+  for (var i = 0; i < 9; i++) {
+    var v = scene16Tiles[i] && scene16Tiles[i].querySelector("video");
+    if (v && v.readyState === 0) {
+      v.load();
+    }
+  }
+}
+
+function runSpiralStep() {
+  if (!scene16Active || scene16CurrentTile >= SCENE16_SPIRAL.length) return;
+
+  var tileIdx = SCENE16_SPIRAL[scene16CurrentTile];
+  var tile = scene16Tiles[tileIdx];
+  if (!tile) return;
+
+  var vid = tile.querySelector("video");
+
+  // Wash previous tile
+  if (scene16CurrentTile > 0) {
+    var prevIdx = SCENE16_SPIRAL[scene16CurrentTile - 1];
+    var prevTile = scene16Tiles[prevIdx];
+    if (prevTile) {
+      prevTile.classList.remove("focused");
+      prevTile.classList.add("color-bleed");
+      setTimeout(function(t) {
+        if (t) { t.classList.remove("color-bleed"); t.classList.add("washed"); }
+      }, 4500, prevTile);
+    }
+  }
+
+  // Focus current
+  tile.classList.add("focused");
+  if (vid) { vid.play().catch(function(){}); }
+
+  scene16CurrentTile++;
+  scene16Timer = setTimeout(runSpiralStep, SCENE16_FOCUS_MS);
+}
+
+function createScene16Rain() {
+  var container = document.getElementById("scene16-rain");
+  if (!container) return;
+
+  for (var i = 0; i < 80; i++) {
+    var drop = document.createElement("div");
+    drop.className = "scene16-rain-drop";
+    drop.style.left = Math.random() * 100 + "%";
+    drop.style.animationDuration = (Math.random() * 0.5 + 0.4) + "s";
+    drop.style.animationDelay = Math.random() * 1.2 + "s";
+    drop.style.opacity = Math.random() * 0.3 + 0.2;
+    container.appendChild(drop);
+  }
+}
+
+function onScene16Visibility() {
+  if (document.hidden) {
+    for (var i = 0; i < scene16Tiles.length; i++) {
+      var v = scene16Tiles[i] && scene16Tiles[i].querySelector("video");
+      if (v) v.pause();
+    }
+  }
+}
 
 /* === INITIAL SCENE (no transition) === */
 function initFirstScene() {

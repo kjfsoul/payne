@@ -4,7 +4,7 @@
 import re, sys
 
 AUTH_FILE = "/home/opsadmin/finalnicolepaynefitz/stitch_the_believing_cinematic_scroll/you_said_you_still_love_me._i_belie.txt_3.txt"
-JS_FILE = "/home/opsadmin/the-believing/dist/assets/app.js"
+JS_FILE = "assets/app.js"
 
 def extract_authoritative(path):
     with open(path, 'r') as f:
