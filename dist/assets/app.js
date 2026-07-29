@@ -72,7 +72,7 @@ var SCENES = [
     video: null,
     text: "I watched and admired your mom keep choosing family through grief, bankruptcy, separation, and rebuilding. She\u2019s a pillar of strength in the face of adversity and under the weight of sorrow, and that is to be honored.",
     overlay: "overlay-right",
-    textPos: "text-top-right",
+    textPos: "text-top-center",
     emphasis: null,
     bgClass: null,
     zoomOut: false
@@ -82,7 +82,7 @@ var SCENES = [
     video: null,
     text: "Please have her contact me and come inside to help carry what you left behind and to take from me the scene I can\u2019t bear to keep living inside. And if you can come too\u2014help her, face me, look at what remains and decide what it means\u2014then come.",
     overlay: "overlay-center",
-    textPos: "text-bottom-center",
+    textPos: "text-top-center",
     emphasis: null,
     bgClass: null,
     zoomOut: false
@@ -142,7 +142,7 @@ var SCENES = [
     video: null,
     text: "This time... there\u2019s no escape. Not without you. I have always chosen you. It\u2019s your choice that strangles me now\u2014and only your choice that can loosen the grip. I don\u2019t want to tell you this. It gives you a power over me I don\u2019t want you to have. But you are still the reason I am fighting to get through today.",
     overlay: "overlay-center",
-    textPos: "text-top-left",
+    textPos: "text-top-center",
     emphasis: "I have always chosen you.",
     bgClass: null,
     zoomOut: true
@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=16";
+    img.src = s.image + "?v=17";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=16";
+    vid.src = s.video + "?v=17";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -247,6 +247,10 @@ function buildSceneEl(idx) {
   var p = document.createElement("p");
   p.className = "scene-text";
 
+  // Scene 6: glowing red text
+  if (idx === 5) {
+    p.classList.add("scene-text-red");
+  }
   if (s.emphasis) {
     var parts = s.text.split(s.emphasis);
     if (parts.length === 2) {
@@ -441,7 +445,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=16";
+  link.href = SCENES[idx].image + "?v=17";
   document.head.appendChild(link);
 }
 
@@ -506,7 +510,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=16";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=17";
     vid.muted = true; vid.playsInline = true; vid.loop = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "metadata");
