@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=27";
+    img.src = s.image + "?v=28";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=27";
+    vid.src = s.video + "?v=28";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -462,7 +462,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=27";
+  link.href = SCENES[idx].image + "?v=28";
   document.head.appendChild(link);
 }
 
@@ -527,7 +527,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=27";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=28";
     vid.muted = true; vid.playsInline = true; vid.loop = true; vid.autoplay = true;
     vid.setAttribute("playsinline", "");
     vid.style.opacity = "1";
@@ -621,11 +621,11 @@ function createScene16Rain() {
     var d = document.createElement("div");
     d.className = "scene16-rain-drop";
     d.style.left = Math.random() * 100 + "%";
-    d.style.width = (Math.random() * 2 + 1) + "px";
-    d.style.height = (Math.random() * 30 + 20) + "px";
-    d.style.animationDuration = (Math.random() * 0.6 + 0.5) + "s";
-    d.style.animationDelay = Math.random() * 1.5 + "s";
-    d.style.opacity = Math.random() * 0.4 + 0.3;
+    d.style.width = (Math.random() * 3 + 1) + "px";
+    d.style.height = (Math.random() * 50 + 30) + "px";
+    d.style.animationDuration = (Math.random() * 1.2 + 0.8) + "s";
+    d.style.animationDelay = Math.random() * 3 + "s";
+    d.style.opacity = 0.6;
     c.appendChild(d);
   }
 }
