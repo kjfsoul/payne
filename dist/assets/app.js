@@ -88,13 +88,13 @@ var SCENES = [
     zoomOut: false
   },
   {
-    image: null,
+    image: "assets/images/09.webp",
     video: null,
     text: "Stop making the people who still love you pack away every piece of our shared joy alone while you are having the time... of your life.",
     overlay: "overlay-bottom",
     textPos: "text-bottom-left",
     emphasis: null,
-    bgClass: "scene-bg-smoky",
+    bgClass: null,
     zoomOut: false
   },
   {
@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=29";
+    img.src = s.image + "?v=30";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=29";
+    vid.src = s.video + "?v=30";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -462,7 +462,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=29";
+  link.href = SCENES[idx].image + "?v=30";
   document.head.appendChild(link);
 }
 
@@ -527,7 +527,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=29";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=30";
     vid.muted = true; vid.playsInline = true; vid.loop = true; vid.autoplay = true;
     vid.setAttribute("playsinline", "");
     vid.style.opacity = "1";
