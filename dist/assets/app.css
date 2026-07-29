@@ -273,18 +273,89 @@ html, body {
 .scene16-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:2px;background:#000;z-index:1}
 .scene16-tile{position:relative;overflow:hidden;background:#111;transition:transform .8s ease,filter 1s ease,opacity 1.5s ease}
 .scene16-tile video{width:100%;height:100%;object-fit:cover}
-.scene16-tile.focused{z-index:5;transform:scale(1.25);box-shadow:0 0 40px rgba(0,0,0,.7)}
-.scene16-tile.washed{filter:brightness(.15) saturate(.1) blur(2px);background:#08080a}
 .scene16-tile.washed::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,10,.3),rgba(8,8,10,.6) 50%,rgba(8,8,10,.95))}
-.scene16-tile.color-bleed{animation:bleed-down 4s ease-in forwards}
-@keyframes bleed-down{0%{filter:brightness(1) saturate(1) blur(0)}30%{filter:brightness(1.2) saturate(1.5) blur(0)}70%{filter:brightness(.8) saturate(2) blur(1px)}100%{filter:brightness(.15) saturate(.1) blur(2px)}}
-.scene16-rain{position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden}
-.scene16-rain-drop{position:absolute;width:2px;height:50px;background:linear-gradient(to bottom,transparent,rgba(180,200,220,.4));animation:rain-fall linear infinite;opacity:.5}
-@keyframes rain-fall{0%{transform:translateY(-100px)}100%{transform:translateY(calc(100vh + 100px))}}
-.scene16-overlay{position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.6) 100%)}
-@media (prefers-reduced-motion:reduce){.scene16-tile{transition:none!important;animation:none!important}.scene16-tile.focused{transform:scale(1.05);opacity:1}.scene16-tile.washed{opacity:.3;filter:brightness(.3)}.scene16-rain-drop{display:none}.scene16-tile.color-bleed{animation:none;opacity:.3;filter:brightness(.3)}}
-.text-box-black{background:rgba(0,0,0,0.75);padding:1rem 1.5rem;border-radius:3px}
-.scene16-tile{border:1px solid rgba(68,226,205,.15);box-shadow:inset 0 0 20px rgba(68,226,205,.05)}
-.scene16-tile video{opacity:1}
-.scene16-tile.focused video{opacity:1}
-.scene16-tile.focused{border-color:rgba(68,226,205,.4);box-shadow:inset 0 0 30px rgba(68,226,205,.1),0 0 40px rgba(0,0,0,.7)}
+
+/* Focus stage: tile zooms forward */
+.scene16-tile.focused-stage {
+  animation: tile-focus 5s ease-in-out forwards;
+  z-index: 5;
+}
+@keyframes tile-focus {
+  0% { transform: scale(1); filter: brightness(1) saturate(1); box-shadow: none; }
+  30% { transform: scale(1.2); filter: brightness(1.2); box-shadow: 0 0 40px rgba(68,226,205,0.4); }
+  100% { transform: scale(1.2); filter: brightness(1.2); }
+}
+
+/* Bleed stage: colors smear downward */
+.scene16-tile.bleed-stage {
+  animation: tile-bleed 4s ease-in forwards;
+}
+@keyframes tile-bleed {
+  0% { filter: brightness(1.2) saturate(1); }
+  40% { filter: brightness(1.4) saturate(2) blur(1px); transform: scale(1.2) translateY(0); }
+  100% { filter: brightness(0.3) saturate(3) blur(4px); transform: scale(1.2) translateY(10px); }
+}
+
+/* Washed stage: tile becomes dark wet glass */
+.scene16-tile.washed-stage {
+  animation: tile-wash 3s ease-in forwards;
+}
+@keyframes tile-wash {
+  0% { filter: brightness(0.3) saturate(3) blur(4px); }
+  50% { filter: brightness(0.15) saturate(0.2) blur(6px); }
+  100% { filter: brightness(0.08) saturate(0.05) blur(8px); background: #050508; }
+}
+
+/* Rain container — always visible */
+.scene16-rain {
+  position: absolute; inset: 0; z-index: 10; pointer-events: none; overflow: hidden;
+}
+.scene16-rain-drop {
+  position: absolute;
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(180,210,240,0.6), rgba(180,210,240,0.15));
+  animation: rain-down linear infinite;
+  opacity: 0.5;
+}
+@keyframes rain-down {
+  0% { transform: translateY(-60px); opacity: 0.6; }
+  80% { opacity: 0.3; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* Farewell text — hidden initially, revealed at center after all tiles wash */
+.scene16-farewell {
+  position: absolute; inset: 0; z-index: 20; display: flex;
+  flex-direction: column; align-items: center; justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  animation: farewell-reveal 3s ease-in 26s forwards;
+}
+.scene16-farewell .farewell-main {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-style: italic;
+  color: #e4e2e4;
+  text-shadow: 0 0 20px rgba(68,226,205,0.5), 0 0 40px rgba(68,226,205,0.3);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+.scene16-farewell .farewell-sub {
+  font-family: 'EB Garamond', 'Times New Roman', serif;
+  font-size: clamp(16px, 2.5vw, 22px);
+  color: rgba(228,226,228,0.7);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-shadow: 0 0 12px rgba(68,226,205,0.3);
+}
+@keyframes farewell-reveal {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene16-tile { animation: none !important; opacity: 1 !important; }
+  .scene16-tile.washed-stage { filter: brightness(0.2); }
+  .scene16-rain-drop { display: none; }
+  .scene16-farewell { animation: none; opacity: 1; }
+}
