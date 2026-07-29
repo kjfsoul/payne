@@ -359,3 +359,4 @@ html, body {
   .scene16-rain-drop { display: none; }
   .scene16-farewell { animation: none; opacity: 1; }
 }
+.text-box-black{background:rgba(0,0,0,0.75);padding:1rem 1.5rem;border-radius:3px}

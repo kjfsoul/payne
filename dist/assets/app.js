@@ -4,7 +4,7 @@ var scene16Timer = null;
 var scene16CurrentTile = 0;
 var scene16Tiles = [];
 var SCENE16_SPIRAL = [0, 1, 2, 5, 8, 7, 6, 3, 4];
-var SCENE16_FOCUS_MS = 5000;
+var SCENE16_FOCUS_MS = 3000;
 
 var SCENES = [
   {
@@ -197,7 +197,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=28";
+    img.src = s.image + "?v=29";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -213,7 +213,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=28";
+    vid.src = s.video + "?v=29";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -462,7 +462,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=28";
+  link.href = SCENES[idx].image + "?v=29";
   document.head.appendChild(link);
 }
 
@@ -527,7 +527,7 @@ function buildScene16(el) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=28";
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=29";
     vid.muted = true; vid.playsInline = true; vid.loop = true; vid.autoplay = true;
     vid.setAttribute("playsinline", "");
     vid.style.opacity = "1";
@@ -611,6 +611,16 @@ function runSpiralStep() {
   var v = tile.querySelector("video");
   if (v) v.play().catch(function(){});
   scene16CurrentTile++;
+  if (scene16CurrentTile >= SCENE16_SPIRAL.length) {
+    // All tiles done — freeze all videos after final wash
+    setTimeout(function() {
+      var allTiles = document.querySelectorAll('.scene16-tile');
+      for (var t = 0; t < allTiles.length; t++) {
+        var v = allTiles[t].querySelector('video');
+        if (v) { v.pause(); v.style.opacity = '0.15'; }
+      }
+    }, SCENE16_FOCUS_MS + 2000);
+  }
   scene16Timer = setTimeout(runSpiralStep, SCENE16_FOCUS_MS);
 }
 
