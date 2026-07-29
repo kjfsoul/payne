@@ -190,7 +190,7 @@ function buildSceneEl(idx) {
     var img = document.createElement("img");
     img.className = "scene-bg";
     img.alt = "";
-    img.src = s.image + "?v=14";
+    img.src = s.image + "?v=15";
     if (s.zoomOut) {
       img.style.objectFit = "contain";
       img.style.animation = "none";
@@ -206,7 +206,7 @@ function buildSceneEl(idx) {
   if (s.video) {
     var vid = document.createElement("video");
     vid.className = "scene-bg-video";
-    vid.src = s.video + "?v=14";
+    vid.src = s.video + "?v=15";
     vid.playsInline = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "auto");
@@ -267,8 +267,12 @@ for (var i = 0; i < SCENES.length; i++) {
   viewer.appendChild(el);
   sceneEls.push(el);
 }
-// Scene 16: replace default content with video grid
-buildScene16(sceneEls[15]);
+// Scene 16: build video grid after DOM insertion
+if (sceneEls[15]) {
+  var s16el = sceneEls[15];
+  while (s16el.firstChild) s16el.removeChild(s16el.firstChild);
+  buildScene16(s16el);
+}
 
 /* === SHOW SCENE === */
 function showScene(idx, direction) {
@@ -346,14 +350,6 @@ function showScene(idx, direction) {
     if (!isVideoScene && wasVideoScene) {
       bgAudio.play().catch(function() {});
     }
-  }
-
-  // Scene 16: start/stop controller
-  if (idx === 15) {
-    setTimeout(function() { startScene16(); }, 300);
-  }
-  if (oldIdx === 15) {
-    stopScene16();
   }
 
   // Scene 15: manage video playback (2 loops max) and caption
@@ -438,7 +434,7 @@ function preloadImage(idx) {
   var link = document.createElement("link");
   link.rel = "preload";
   link.as = "image";
-  link.href = SCENES[idx].image + "?v=14";
+  link.href = SCENES[idx].image + "?v=15";
   document.head.appendChild(link);
 }
 
@@ -495,7 +491,7 @@ document.addEventListener("touchend", function(e) {
 });
 
 
-/* ============ SCENE 16: VIDEO GRID CONTROLLER ============ */
+/* ============ SCENE 16: VIDEO GRID ============ */
 var scene16Active = false;
 var scene16Timer = null;
 var scene16CurrentTile = 0;
@@ -506,56 +502,43 @@ var SCENE16_FOCUS_MS = 5000;
 function buildScene16(el) {
   var grid = document.createElement("div");
   grid.className = "scene16-grid";
-
   for (var i = 0; i < 9; i++) {
     var tile = document.createElement("div");
     tile.className = "scene16-tile";
-    tile.setAttribute("data-tile", i);
-
     var vid = document.createElement("video");
-    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=14";
-    vid.muted = true;
-    vid.playsInline = true;
-    vid.loop = true;
+    vid.src = "assets/scene16/scene16-0" + (i + 1) + ".mp4?v=15";
+    vid.muted = true; vid.playsInline = true; vid.loop = true;
     vid.setAttribute("playsinline", "");
     vid.setAttribute("preload", "metadata");
-
     tile.appendChild(vid);
     grid.appendChild(tile);
     scene16Tiles[i] = tile;
   }
-
   var rain = document.createElement("div");
   rain.className = "scene16-rain";
   rain.id = "scene16-rain";
-  el.appendChild(rain);
-
   var ovl = document.createElement("div");
   ovl.className = "scene16-overlay";
+  el.appendChild(rain);
   el.appendChild(ovl);
-
   el.appendChild(grid);
 }
 
 function startScene16() {
   if (scene16Active) return;
-  scene16Active = true;
-  scene16CurrentTile = 0;
-
-  loadScene16Videos();
-  createScene16Rain();
-
-  if (SCENE16_SPIRAL.length > 0) {
-    runSpiralStep();
+  scene16Active = true; scene16CurrentTile = 0;
+  for (var i = 0; i < 9; i++) {
+    var v = scene16Tiles[i] && scene16Tiles[i].querySelector("video");
+    if (v && v.readyState === 0) v.load();
   }
-
+  createScene16Rain();
+  if (SCENE16_SPIRAL.length > 0) runSpiralStep();
   document.addEventListener("visibilitychange", onScene16Visibility);
 }
 
 function stopScene16() {
   scene16Active = false;
   if (scene16Timer) { clearTimeout(scene16Timer); scene16Timer = null; }
-
   for (var i = 0; i < 9; i++) {
     if (scene16Tiles[i]) {
       var v = scene16Tiles[i].querySelector("video");
@@ -563,65 +546,44 @@ function stopScene16() {
       scene16Tiles[i].classList.remove("focused", "washed", "color-bleed");
     }
   }
-
-  var rain = document.getElementById("scene16-rain");
-  if (rain) rain.innerHTML = "";
-
+  var r = document.getElementById("scene16-rain");
+  if (r) r.innerHTML = "";
   document.removeEventListener("visibilitychange", onScene16Visibility);
-  scene16Tiles = [];
-}
-
-function loadScene16Videos() {
-  for (var i = 0; i < 9; i++) {
-    var v = scene16Tiles[i] && scene16Tiles[i].querySelector("video");
-    if (v && v.readyState === 0) {
-      v.load();
-    }
-  }
 }
 
 function runSpiralStep() {
   if (!scene16Active || scene16CurrentTile >= SCENE16_SPIRAL.length) return;
-
-  var tileIdx = SCENE16_SPIRAL[scene16CurrentTile];
-  var tile = scene16Tiles[tileIdx];
+  var ti = SCENE16_SPIRAL[scene16CurrentTile];
+  var tile = scene16Tiles[ti];
   if (!tile) return;
-
-  var vid = tile.querySelector("video");
-
-  // Wash previous tile
   if (scene16CurrentTile > 0) {
-    var prevIdx = SCENE16_SPIRAL[scene16CurrentTile - 1];
-    var prevTile = scene16Tiles[prevIdx];
-    if (prevTile) {
-      prevTile.classList.remove("focused");
-      prevTile.classList.add("color-bleed");
+    var pt = scene16Tiles[SCENE16_SPIRAL[scene16CurrentTile - 1]];
+    if (pt) {
+      pt.classList.remove("focused");
+      pt.classList.add("color-bleed");
       setTimeout(function(t) {
         if (t) { t.classList.remove("color-bleed"); t.classList.add("washed"); }
-      }, 4500, prevTile);
+      }, 4500, pt);
     }
   }
-
-  // Focus current
   tile.classList.add("focused");
-  if (vid) { vid.play().catch(function(){}); }
-
+  var v = tile.querySelector("video");
+  if (v) v.play().catch(function(){});
   scene16CurrentTile++;
   scene16Timer = setTimeout(runSpiralStep, SCENE16_FOCUS_MS);
 }
 
 function createScene16Rain() {
-  var container = document.getElementById("scene16-rain");
-  if (!container) return;
-
+  var c = document.getElementById("scene16-rain");
+  if (!c) return;
   for (var i = 0; i < 80; i++) {
-    var drop = document.createElement("div");
-    drop.className = "scene16-rain-drop";
-    drop.style.left = Math.random() * 100 + "%";
-    drop.style.animationDuration = (Math.random() * 0.5 + 0.4) + "s";
-    drop.style.animationDelay = Math.random() * 1.2 + "s";
-    drop.style.opacity = Math.random() * 0.3 + 0.2;
-    container.appendChild(drop);
+    var d = document.createElement("div");
+    d.className = "scene16-rain-drop";
+    d.style.left = Math.random() * 100 + "%";
+    d.style.animationDuration = (Math.random() * 0.5 + 0.4) + "s";
+    d.style.animationDelay = Math.random() * 1.2 + "s";
+    d.style.opacity = Math.random() * 0.3 + 0.2;
+    c.appendChild(d);
   }
 }
 

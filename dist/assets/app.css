@@ -270,13 +270,12 @@ html, body {
   .scene-text { font-size: clamp(20px, 3vw, 28px); }
 }
 
-/* ============ SCENE 16: VIDEO GRID ============ */
 .scene16-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:2px;background:#000;z-index:1}
 .scene16-tile{position:relative;overflow:hidden;background:#0a0a0c;transition:transform .8s ease,filter 1s ease,opacity 1.5s ease}
 .scene16-tile video{width:100%;height:100%;object-fit:cover}
 .scene16-tile.focused{z-index:5;transform:scale(1.25);box-shadow:0 0 40px rgba(0,0,0,.7)}
 .scene16-tile.washed{filter:brightness(.15) saturate(.1) blur(2px);background:#08080a}
-.scene16-tile.washed::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,10,.3) 0%,rgba(8,8,10,.6) 50%,rgba(8,8,10,.95) 100%)}
+.scene16-tile.washed::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,10,.3),rgba(8,8,10,.6) 50%,rgba(8,8,10,.95))}
 .scene16-tile.color-bleed{animation:bleed-down 4s ease-in forwards}
 @keyframes bleed-down{0%{filter:brightness(1) saturate(1) blur(0)}30%{filter:brightness(1.2) saturate(1.5) blur(0)}70%{filter:brightness(.8) saturate(2) blur(1px)}100%{filter:brightness(.15) saturate(.1) blur(2px)}}
 .scene16-rain{position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden}
